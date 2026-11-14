@@ -26,7 +26,7 @@ REST API for a personal knowledge base: users store documents in collections and
 1. Clone the repository:
 
    ```bash
-   git clone <repo-url>
+   git clone https://github.com/xD1G1x/knowlage_base_pet.git  
    cd knowlage-base-api
    ```
 
