@@ -262,26 +262,6 @@ apps/
 - `runserver` inside the container (not production-ready), HTTPS/security headers not configured, default `SECRET_KEY` is a dev placeholder.
 - Tests mostly cover collections and the AI layer; there are no tests for documents.
 
-## Troubleshooting
-
-**`database "knowledge_base" does not exist`** — the db name in `.env` (`POSTGRES_DB`) does not match `DATABASE_URL`. If you leave the Compose defaults, both resolve to `knowledge_base`; if you change one, change the other.
-
-**`model 'llama3.1' not found`** — the model is not pulled. Run `docker compose exec ollama ollama pull llama3.1` (or `ollama pull llama3.1` for a local install).
-
-**`Connection refused` on `localhost:11434`** — Ollama is not running. Check `docker compose ps`; the `ollama` service must be `Up` (it has a healthcheck).
-
-**`Connection refused` on port 5432** — the `db` service is not ready yet. Wait for its healthcheck to pass (`docker compose ps` should show `healthy`).
-
-**Swagger UI is empty** — open `http://localhost:8000/api-schema/` directly: it must return YAML generated without errors.
-
-## Roadmap
-
-- [ ] Tests for documents (CRUD, filters, `/ask/` integration)
-- [ ] JWT auth
-- [ ] RAG with embeddings (Qdrant / pgvector)
-- [ ] Celery for async `/ask/`
-- [ ] Rate limiting
-
 ## License
 
 MIT © 2026 Denchk — see [LICENSE](LICENSE)
