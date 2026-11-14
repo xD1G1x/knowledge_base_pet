@@ -1,12 +1,14 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.permissions import IsAuthenticated
 
 from .models import Collection
 from .serializers import CollectionSerializer
 
+
 # Create your views here.
 class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = Collection.objects.none()
     serializer_class = CollectionSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [OrderingFilter, SearchFilter]

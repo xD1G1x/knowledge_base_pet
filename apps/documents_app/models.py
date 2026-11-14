@@ -1,7 +1,8 @@
-from django.db import models
-from apps.collections_app.models import Collection
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.db import models
+
+from apps.collections_app.models import Collection
 
 
 class Document(models.Model):
@@ -30,12 +31,15 @@ class Document(models.Model):
 
     def clean(self):
         super().clean()
-        if self.collection_id and self.owner_id:
-            if self.collection.owner_id != self.owner_id:
-                raise ValidationError(
-                    {"collection": "Коллекция принадлежит другому пользователю."}
-                )
-    
+        if (
+            self.collection_id
+            and self.owner_id
+            and self.collection.owner_id != self.owner_id
+        ):
+            raise ValidationError(
+                {"collection": "Коллекция принадлежит другому пользователю."}
+            )
+
     def __str__(self) -> str:
         return self.title or f"Document #{self.pk}"
 

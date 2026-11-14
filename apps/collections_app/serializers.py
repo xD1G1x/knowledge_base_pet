@@ -1,5 +1,5 @@
-from django.db import models
 from rest_framework import serializers
+
 from .models import Collection
 
 
@@ -8,13 +8,11 @@ class CollectionSerializer(serializers.ModelSerializer):
         model = Collection
         fields = ("id", "name", "owner", "created_at", "updated_at")
         read_only_fields = ("id", "created_at", "updated_at", "owner")
-        
+
     def validate(self, attrs):
         request = self.context.get("request")
         if request is None:
-            raise serializers.ValidationError(
-                "Request context is required."
-            )
+            raise serializers.ValidationError("Request context is required.")
 
         name = attrs.get("name", self.instance.name if self.instance else None)
         if name is None:

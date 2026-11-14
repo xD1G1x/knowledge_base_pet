@@ -10,14 +10,15 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
-from pathlib import Path
-import environ
 import os
+from pathlib import Path
+
+import environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env = environ.Env(DEBUG=(bool, True))
+env = environ.Env(DEBUG=(bool, False))
 
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
@@ -25,13 +26,12 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY", default="dev-only-not-for-prod-" + "x" * 40)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1"])
 
 # Application definition
 
@@ -57,6 +57,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 10,
+    "EXCEPTION_HANDLER": "apps.ai.exceptions_handler.ai_exception_handler",
 }
 
 SPECTACULAR_SETTINGS = {
@@ -154,3 +155,22 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+
+# Ollama
+OLLAMA_URL = env("OLLAMA_URL", default="http://localhost:11434/api/chat")
+OLLAMA_MODEL = env("OLLAMA_MODEL", default="llama3.1")
+OLLAMA_CONNECT_TIMEOUT = env.float("OLLAMA_CONNECT_TIMEOUT", default=5.0)
+OLLAMA_READ_TIMEOUT = env.float("OLLAMA_READ_TIMEOUT", default=120.0)
+OLLAMA_MAX_TOKENS = env.int("AI_MAX_TOKENS", default=1000)
+OLLAMA_TEMPERATURE = env.float("AI_TEMPERATURE", default=0.3)
+CONTEXT_CHAR_LIMIT = env.int("CONTEXT_CHAR_LIMIT", default=10_000)
+
+SILENCED_SYSTEM_CHECKS = [
+    "mail.E001",
+    "security.W004",  # no HTTPS
+    "security.W008",  # no HTTPS
+    "security.W009",
+    "security.W012",  # no HTTPS
+    "security.W016",  # no HTTPS
+    "security.W018",
+]

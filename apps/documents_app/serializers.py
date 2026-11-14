@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from .models import Collection
-from .models import Document, QuestionLog
+from .models import Collection, Document, QuestionLog
 
 
 class DocumentSerializer(serializers.ModelSerializer):

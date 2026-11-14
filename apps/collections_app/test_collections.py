@@ -52,7 +52,9 @@ class TestCollectionAPI:
         assert Collection.objects.filter(owner=user, name="My Collection").exists()
 
     def test_create_sets_owner(self, auth_client, user, other_user):
-        res = auth_client.post(self.url, {"name": "X", "owner": other_user.id}, format="json")
+        res = auth_client.post(
+            self.url, {"name": "X", "owner": other_user.id}, format="json"
+        )
         assert res.status_code == 201
         assert res.data["owner"] == user.id
 
@@ -87,7 +89,9 @@ class TestCollectionAPI:
 
     def test_update(self, auth_client, user):
         c = Collection.objects.create(name="Old", owner=user)
-        res = auth_client.patch(reverse("collection-detail", args=[c.id]), {"name": "New"}, format="json")
+        res = auth_client.patch(
+            reverse("collection-detail", args=[c.id]), {"name": "New"}, format="json"
+        )
         assert res.status_code == 200
         c.refresh_from_db()
         assert c.name == "New"

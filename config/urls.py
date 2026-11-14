@@ -16,9 +16,9 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from rest_framework.routers import DefaultRouter
 
 from apps.collections_app.views import CollectionViewSet
 from apps.documents_app.views import DocumentViewSet, QuestionLogViewSet
