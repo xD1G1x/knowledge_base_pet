@@ -1,5 +1,37 @@
-
 services:
+  db:
+    image: postgres:16
+    container_name: kb-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-knowledge_base}
+      POSTGRES_USER: ${POSTGRES_USER:-kb_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kb_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kb_user} -d ${POSTGRES_DB:-knowledge_base}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: kb-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
   web:
     build: .
     container_name: kb-api
@@ -8,39 +40,17 @@ services:
       - "8000:8000"
     env_file:
       - .env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-kb_user}:${POSTGRES_PASSWORD:-kb_password}@db:5432/${POSTGRES_DB:-knowledge_base}
+      OLLAMA_URL: http://ollama:11434/api/chat
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.1}
     depends_on:
       db:
         condition: service_healthy
       ollama:
-        condition: service_started
+        condition: service_healthy
     volumes:
       - .:/app
-
-  db:
-    image: postgres:16
-    container_name: kb-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
-  ollama:
-    image: ollama/ollama
-    container_name: kb-ollama
-    restart: unless-stopped
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - "11434:11434"
-
 volumes:
   postgres_data:
   ollama_data:
